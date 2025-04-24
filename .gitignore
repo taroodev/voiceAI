@@ -1,0 +1,16 @@
+# Ignorar node_modules
+node_modules/
+
+# Ignorar los archivos de lock de npm y yarn (si no los quieres versionar)
+package-lock.json
+yarn.lock
+
+# Ignorar archivos de entorno
+.env
+
+
+# Archivos de dependencias de compilación
+dist/
+build/
+
+
