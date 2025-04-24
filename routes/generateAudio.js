@@ -42,3 +42,4 @@ router.post('/', async (req, res, next) => {
     next(error);                              // ⬅️  delega al manejador global
   }
 });
+export default router;
