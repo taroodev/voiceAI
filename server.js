@@ -5,7 +5,8 @@ import express from 'express';
 const app = express();
 const port = process.env.PORT || 3000;
 
-const generateAudioRoute = require('./routes/generateAudio');
+import generateAudioRoute from './routes/generateAudio.js';
+
 
 app.use(express.json());
 app.use('/api/generate-audio', generateAudioRoute);
