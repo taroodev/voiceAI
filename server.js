@@ -7,7 +7,7 @@ app.use(express.json({ limit: '2mb' }));               // por si los prompts cre
 
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
+
 import morgan from 'morgan';
 import generateAudioRoute from './routes/generateAudio.js';
 
