@@ -1,45 +1,39 @@
-import cors from 'cors';
-
-app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || true, // varios dominios separados por coma
-}));
-app.use(express.json({ limit: '2mb' }));               // por si los prompts crecen
-
+// ─── Importaciones ──────────────────────────────────────────
 import 'dotenv/config';
 import express from 'express';
-
+import cors from 'cors';
 import morgan from 'morgan';
-import generateAudioRoute from './routes/generateAudio.js';
 import fileUpload from 'express-fileupload';
 
-app.use(fileUpload({
-  limits: { fileSize: 5 * 1024 * 1024 },   // 5 MB máx
-  abortOnLimit: true,
-}));
-const app  = express();
+import generateAudioRoute from './routes/generateAudio.js';
+
+// ─── Instancia y puerto ─────────────────────────────────────
+const app  = express();                     // 1️⃣  crear primero
 const port = process.env.PORT || 3000;
 
-// 1️⃣  CORS para tu dominio(s) WordPress
+// ─── Middlewares globales ───────────────────────────────────
 app.use(cors({
-  origin: process.env.CORS_ORIGIN?.split(',') || true,
+  origin: process.env.CORS_ORIGIN?.split(',') || true, // varios dominios
   methods: ['GET', 'POST'],
 }));
+app.use(express.json({ limit: '2mb' }));    // body-parser
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 },    // 5 MB máx
+  abortOnLimit: true,
+}));
+app.use(morgan('dev'));                     // logs
 
-// 2️⃣  Body parser con límite → el audio y el texto crecen rápido
-app.use(express.json({ limit: '2mb' }));
-app.use(morgan('dev'));
-
+// ─── Rutas ──────────────────────────────────────────────────
 app.use('/api/generate-audio', generateAudioRoute);
+app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// Ruta de salud (útil para ver si el servidor está vivo)
-app.get('/health', (_, res) => res.json({ status: 'ok' }));
-
-// Manejador de errores global
+// ─── Manejador de errores global ────────────────────────────
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(500).json({ error: 'Unexpected server error' });
 });
 
+// ─── Arranque ───────────────────────────────────────────────
 app.listen(port, () =>
   console.log(`VoiceAI listo en http://localhost:${port}`)
 );
