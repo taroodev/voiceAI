@@ -10,7 +10,12 @@ import express from 'express';
 
 import morgan from 'morgan';
 import generateAudioRoute from './routes/generateAudio.js';
+import fileUpload from 'express-fileupload';
 
+app.use(fileUpload({
+  limits: { fileSize: 5 * 1024 * 1024 },   // 5 MB máx
+  abortOnLimit: true,
+}));
 const app  = express();
 const port = process.env.PORT || 3000;
 
