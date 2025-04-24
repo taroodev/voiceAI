@@ -1,8 +1,8 @@
 import express from 'express';
 import { generarAudio } from '../services/elevenLabsService.js';
 import { transcribirAudio } from '../services/whisperService.js';   // ⬅️  NUEVO
-import { openai } from '../lib/openaiClient.js';                     // ⬅️  Factorizado
-
+import { OpenAI } from 'openai';
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const router = express.Router();
 
 router.post('/', async (req, res, next) => {
