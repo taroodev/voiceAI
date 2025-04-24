@@ -1,6 +1,6 @@
 import express from 'express'; 
 import dotenv from 'dotenv';  
-import elevenLabsService from '../services/elevenLabsService.js';   
+import { generarAudio } from '../services/elevenLabsService.js';  
 import { OpenAI } from "openai";  
 
 
@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
 
     const textoRespuesta = chatCompletion.choices[0].message.content;
 
-    const audioBuffer = await elevenLabsService.generarAudio(textoRespuesta);
+    const audioBuffer = await generarAudio(textoRespuesta);
 
     res.set({
       'Content-Type': 'audio/mpeg',
