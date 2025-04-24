@@ -1,9 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const elevenLabsService = require('../services/elevenLabsService');
+import express from 'express'; 
+import dotenv from 'dotenv';  
+import elevenLabsService from '../services/elevenLabsService.js';   
+import { OpenAI } from "openai";  
 
-const { OpenAI } = require("openai");
+
+dotenv.config();
+
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { texto } = req.body;
@@ -14,14 +20,13 @@ router.post('/', async (req, res) => {
 
   try {
     const textoUsuario = texto;
-
   
     const chatCompletion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",  
-        messages: [{ role: "user", content: textoUsuario }],
-      });
-    const textoRespuesta = chatCompletion.choices[0].message.content;
+      model: "gpt-4o-mini",  
+      messages: [{ role: "user", content: textoUsuario }],
+    });
 
+    const textoRespuesta = chatCompletion.choices[0].message.content;
 
     const audioBuffer = await elevenLabsService.generarAudio(textoRespuesta);
 
@@ -36,4 +41,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

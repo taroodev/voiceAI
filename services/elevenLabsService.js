@@ -1,9 +1,10 @@
+import axios from 'axios';   
+import dotenv from 'dotenv';  
 
-const axios = require('axios');
-require('dotenv').config();
+dotenv.config();   
 
 const API_KEY = process.env.ELEVENLABS_API_KEY;
-const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL'; 
+const VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
 
 const generarAudio = async (texto) => {
   const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`;
@@ -23,12 +24,17 @@ const generarAudio = async (texto) => {
     }
   };
 
-  const response = await axios.post(url, body, {
-    headers,
-    responseType: 'arraybuffer'
-  });
+  try {
+    const response = await axios.post(url, body, {
+      headers,
+      responseType: 'arraybuffer'
+    });
 
-  return response.data; 
+    return response.data;
+  } catch (error) {
+    console.error('Error generando audio:', error.message);
+    throw error; 
+  }
 };
 
-module.exports = { generarAudio };
+export { generarAudio };  
