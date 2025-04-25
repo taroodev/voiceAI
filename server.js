@@ -26,6 +26,9 @@ app.use(morgan('dev'));                     // logs
 // ─── Rutas ──────────────────────────────────────────────────
 app.use('/api/generate-audio', generateAudioRoute);
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/', (_req, res) =>
+  res.send('✅ VoiceAI backend operativo')
+);
 
 // ─── Manejador de errores global ────────────────────────────
 app.use((err, _req, res, _next) => {
