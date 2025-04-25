@@ -33,8 +33,11 @@ app.get('/', (_req, res) =>
 // ─── Manejador de errores global ────────────────────────────
 app.use((err, _req, res, _next) => {
   console.error(err);
-  res.status(500).json({ error: 'Unexpected server error' });
+  const status = err.status || err.response?.status || 500;
+  const msg    = err.message || err.response?.data?.error || 'Unexpected error';
+  res.status(status).json({ error: msg });
 });
+
 
 // ─── Arranque ───────────────────────────────────────────────
 app.listen(port, () =>
