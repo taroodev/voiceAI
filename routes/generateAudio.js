@@ -1,4 +1,4 @@
-// routes/generate-text.js
+
 import express from 'express';
 import { transcribirAudio } from '../services/whisperService.js'; // sigue siendo útil si permites audio
 import { openai } from '../lib/openaiClient.js';
