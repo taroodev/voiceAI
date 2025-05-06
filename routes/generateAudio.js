@@ -1,45 +1,47 @@
+// routes/generate-text.js
 import express from 'express';
-import { generarAudio } from '../services/elevenLabsService.js';
-import { transcribirAudio } from '../services/whisperService.js';   // ⬅️  NUEVO
+import { transcribirAudio } from '../services/whisperService.js'; // sigue siendo útil si permites audio
 import { openai } from '../lib/openaiClient.js';
+
 const router = express.Router();
 
 router.post('/', async (req, res, next) => {
   try {
-    // ‼️  Detecta si llega audio (multipart/form-data) o JSON con texto
+    /* 1️⃣ ── Obtener el prompt -------------------------------------------- */
     let prompt;
+
     if (req.is('application/json')) {
       const { texto } = req.body;
-      if (!texto?.trim()) return res.status(400).json({ error: 'Texto requerido' });
+      if (!texto?.trim()) {
+        return res.status(400).json({ error: 'Texto requerido' });
+      }
       prompt = texto;
+
     } else if (req.is('multipart/form-data')) {
-      if (!req.files?.audio) return res.status(400).json({ error: 'Audio requerido' });
-      prompt = await transcribirAudio(req.files.audio);     // Whisper u OpenAI Speech-to-Text
+      if (!req.files?.audio) {
+        return res.status(400).json({ error: 'Audio requerido' });
+      }
+      prompt = await transcribirAudio(req.files.audio); // Whisper / STT
     } else {
       return res.status(415).json({ error: 'Tipo de contenido no soportado' });
     }
 
-    // GPT-4o  (streaming opcional)
+    /* 2️⃣ ── Llamar al LLM -------------------------------------------------- */
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model   : 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
     });
-    const respuesta = completion.choices[0]?.message?.content || 'No entendí 🤖';
 
-    // ElevenLabs (control de longitud → máx. 2 500 caracteres / 100 líneas aprox.)
-    if (respuesta.length > 2400) throw new Error('La respuesta supera el límite de ElevenLabs');
-    const audioBuffer = await generarAudio(respuesta);
+    const respuesta =
+      completion.choices[0]?.message?.content?.trim() || 'No entendí 🤖';
 
-    res.set({
-      'Content-Type'     : 'audio/mpeg',
-      'Content-Disposition': 'inline; filename="respuesta.mp3"',
-      'Content-Length'   : audioBuffer.byteLength,
-    });
-    res.send(audioBuffer);
+    /* 3️⃣ ── Responder en JSON --------------------------------------------- */
+    res.json({ respuesta });
 
   } catch (error) {
-    console.error('Error en /generate-audio →', error);
-    next(error);                              // ⬅️  delega al manejador global
+    console.error('Error en /generate-text →', error);
+    next(error);
   }
 });
+
 export default router;
